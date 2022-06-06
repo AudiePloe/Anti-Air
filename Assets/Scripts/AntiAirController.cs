@@ -25,6 +25,7 @@ public class AntiAirController : MonoBehaviour
 
     float verticalRotation = 0f;
     float time = 0f;
+    bool fireOrientation = false;
 
     void Start()
     {
@@ -50,6 +51,11 @@ public class AntiAirController : MonoBehaviour
             HorizontalCam.transform.Rotate(0, -horizontalMovementSpeed * Time.deltaTime, 0);
         }
 
+        if (Input.GetKey(KeyCode.DownArrow) && verticalRotation > -90f)
+        {
+            VerticalCam.transform.Rotate(-verticalMovementSpeed * Time.deltaTime, 0, 0);
+            verticalRotation -= verticalMovementSpeed * Time.deltaTime;
+        }
 
         if (Input.GetKey(KeyCode.UpArrow) && verticalRotation < 0f)
         {
@@ -57,19 +63,23 @@ public class AntiAirController : MonoBehaviour
             verticalRotation += verticalMovementSpeed * Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.DownArrow) && verticalRotation > -90f)
-        {
-            VerticalCam.transform.Rotate(-verticalMovementSpeed * Time.deltaTime, 0, 0);
-            verticalRotation -= verticalMovementSpeed * Time.deltaTime;
-        }
-
 
 
         if (Input.GetKey(KeyCode.Space) && time >= fireRate)
         {
-            Rigidbody bulletClone = (Rigidbody)Instantiate(bullet, leftBarrel.position, leftBarrel.rotation);
-            //bulletClone.GetComponent<Rigidbody>().AddForce(leftBarrel.forward * bulletVelocity);
-            bulletClone.velocity = new Vector3(0, 0, bulletVelocity);
+            if(fireOrientation)
+            {
+                Rigidbody bulletClone = (Rigidbody)Instantiate(bullet, rightBarrel.position, rightBarrel.rotation);
+                bulletClone.GetComponent<Rigidbody>().AddForce(rightBarrel.forward * bulletVelocity);
+                fireOrientation = false;
+            }
+            else
+            {
+                Rigidbody bulletClone = (Rigidbody)Instantiate(bullet, leftBarrel.position, leftBarrel.rotation);
+                bulletClone.GetComponent<Rigidbody>().AddForce(leftBarrel.forward * bulletVelocity);
+                fireOrientation = true;
+            }
+
             time = 0;
         }
 
